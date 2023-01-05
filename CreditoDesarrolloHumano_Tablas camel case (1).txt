@@ -1,0 +1,175 @@
+create table Empleado(
+EmpleadoId integer NOT NULL,
+EmpleadoPrimerNombre varchar(20) NOT NULL,
+EmpleadoPrimerApellido varchar(20) NOT NULL,
+EmpleadoEdad integer NOT NULL,
+EmpleadoGenero Varchar(30) NOT NULL,
+CONSTRAINT pk_Empleado PRIMARY KEY (EmpleadoId)
+);
+
+create table Agencia (
+AgenciaId integer NOT NULL,
+ProvinciaId integer NOT NULL,
+CantonId integer NOT NULL,
+ParroquiaId integer NOT NULL,
+AgenciaNombre varchar(30) NOT NULL,
+AgenciaStatus varchar(15) NOT NULL,
+AgenciaTelefono varchar(15) NOT NULL,
+AgenciaCorreo varchar(50) NOT NULL,
+CONSTRAINT pk_Agencia PRIMARY KEY (AgenciaId),
+FOREIGN KEY (ProvinciaId) REFERENCES Provincia(ProvinciaId),
+FOREIGN KEY (CantonId) REFERENCES Canton(CantonId),
+FOREIGN KEY (ParroquiaId) REFERENCES Parroquia(ParroquiaId)
+);
+
+create table Posee (
+EmpleadoId integer NOT NULL,
+RolId integer NOT NULL,
+CONSTRAINT pk_Posee PRIMARY KEY (EmpleadoId, RolId),
+FOREIGN KEY (EmpleadoId) REFERENCES Empleado(EmpleadoId),
+FOREIGN KEY (RolId) REFERENCES Rol(RolId)
+);
+
+create table Rol(
+RolId integer NOT NULL,
+RolNombre varchar (30) NOT NULL,
+RolDescripcion varchar (100) NOT NULL,
+CONSTRAINT pk_Rol PRIMARY KEY (RolId)
+);
+
+create table Permiso (
+PermisoId integer NOT NULL,
+PermisoNombre text varchar (30) NOT NULL,
+PermisoDescripcion varchar (100) NOT NULL,
+CONSTRAINT pk_Permiso PRIMARY KEY (PermisoId)
+);
+
+create table EmpleadoRolPermiso (
+EmpleadoId integer NOT NULL,
+RolId integer NOT NULL,
+PermisoId integer NOT NULL,
+CONSTRAINT pk_EmpleadoRolPermiso PRIMARY KEY (EmpleadoId, RolId, PermisoId),
+FOREIGN KEY (EmpleadoId) REFERENCES Empleado(EmpleadoId),
+FOREIGN KEY (RolId) REFERENCES Rol(RolId),
+FOREIGN KEY (PermisoId) REFERENCES Permiso(PermisoId)
+);
+
+create table Servicio (
+ServicioId integer NOT NULL,
+EmpleadoId integer NOT NULL,
+AgenciaId integer NOT NULL,
+ServicioNombre varchar(30) NOT NULL,
+ServicioDescripcion varchar(100) NOT NULL,
+ServicioTipo varchar(50) NOT NULL,
+ServicioStatus varchar(15) NOT NULL,
+ServicioMonto integer(20) NOT NULL,
+ServicioTiempo varchar(30) NOT NULL,
+CONSTRAINT pk_Servicio PRIMARY KEY (ServicioId),
+FOREIGN KEY (EmpleadoId) REFERENCES Empleado(EmpleadoId),
+FOREIGN KEY (AgenciaId) REFERENCES Agencia(AgenciaId)
+);
+
+create table Deriva (
+ServicioId integer NOT NULL,
+ParametroId integer NOT NULL,
+DerivaMonto integer NOT NULL,
+CONSTRAINT pk_Deriva PRIMARY KEY(ServicioId, ParametroId),
+FOREIGN KEY (ServicioId) REFERENCES Servicio(ServicioId),
+FOREIGN KEY (ParametroId) REFERENCES Parametro(ParametroId)
+);
+
+
+create table Parametro (
+ParametroId integer NOT NULL,
+ServicioId integer NOT NULL,
+ParametroNombre Varchar(30) NOT NULL,
+ParametroDescripcion Varchar(100) NOT NULL,
+ParametroBaseLegal Varchar(255) NOT NULL,
+ParametroStatus Varchar(15) NOT NULL,
+ParametroFechaDeclaracion text NOT NULL,
+ParametroFechaDerogacion text NOT NULL,
+CONSTRAINT pk_Parametro PRIMARY KEY (ParametroId),
+FOREIGN KEY (ServicioId) REFERENCES Servicio(ServicioId)
+);
+
+
+create table Recibe (
+BeneficiarioId integer NOT NULL,
+ParametroId integer NOT NULL,
+ServicioId integer NOT NULL,
+CONSTRAINT pk_Recibe PRIMARY KEY (BeneficiarioId, ParametroId, ServicioId),
+FOREIGN KEY (ServicioId) REFERENCES Servicio(ServicioId),
+FOREIGN KEY (ParametroId) REFERENCES Parametro(ParametroId),
+FOREIGN KEY (BeneficiarioId) REFERENCES Beneficiario(BeneficiarioId)
+);
+
+
+create table Amortizacion (
+AmortizacionId integer NOT NULL,
+ServicioId integer NOT NULL,
+ParametroId integer NOT NULL,
+BeneficiarioId integer NOT NULL,
+AmortizacionFechaTransaccion text NOT NULL,
+AmortizacionPagoPeriodico real NOT NULL,
+AmortizacionCapital real NOT NULL,
+AmortizacionNumeroTotalPagos integer NOT NULL,
+AmortizacionTipoInteresPeriodico real NOT NULL,
+CONSTRAINT pk_Amortizacion PRIMARY KEY (AmortizacionId),
+FOREIGN KEY (ServicioId) REFERENCES Servicio(ServicioId),
+FOREIGN KEY (ParametroId) REFERENCES Parametro(ParametroId),
+FOREIGN KEY (BeneficiarioId) REFERENCES Beneficiario(BeneficiarioId)
+);
+
+
+create table Beneficiario (
+BeneficiarioId integer NOT NULL,
+ProvinciaId integer NOT NULL,
+CantonId integer NOT NULL,
+ParroquiaId integer NOT NULL,
+ProyectoId integer NOT NULL,
+BeneficiarioPrimerNombre varchar(30) NOT NULL,
+BeneficiarioPrimerApellido varchar(30) NOT NULL,
+BeneficiarioFechaNacimiento text NOT NULL,
+BeneficiarioEdad integer NOT NULL,
+BeneficiarioGenero varchar(30) NOT NULL,
+CONSTRAINT pk_Beneficiario PRIMARY KEY (BeneficiarioId),
+FOREIGN KEY (ProyectoId) REFERENCES Proyecto(ProyectoId),
+FOREIGN KEY (ProvinciaId) REFERENCES Provincia(ProvinciaId),
+FOREIGN KEY (CantonId) REFERENCES Canton(CantonId),
+FOREIGN KEY (ParroquiaId) REFERENCES Parroquia(ParroquiaId)
+);
+
+create table Proyecto(
+ProyectoId integer NOT NULL,
+ProyectoNombre varchar(30) NOT NULL,
+ProyectoTipo varchar(50) NOT NULL,
+ProyectoStatus varchar(15) NOT NULL,
+CONSTRAINT pk_Proyecto PRIMARY KEY (ProyectoId)
+);
+
+create table Provincia (
+ProvinciaId integer NOT NULL,
+ProvinciaNombre varchar(30) NOT NULL,
+ProvinciaStatus varchar(15) NOT NULL,
+CONSTRAINT pk_Provincia PRIMARY KEY (ProvinciaId)
+);
+
+create table Canton (
+CantonId integer NOT NULL,
+ProvinciaId integer NOT NULL,
+CantonNombre varchar(30) NOT NULL,
+CantonStatus varchar(15) NOT NULL,
+CONSTRAINT pk_Canton PRIMARY KEY (CantonId),
+FOREIGN KEY (ProvinciaId) REFERENCES Provincia(ProvinciaId)
+);
+
+create table Parroquia (
+ParroquiaId integer NOT NULL,
+CantonId integer NOT NULL,
+ProvinciaId integer NOT NULL,
+ParroquiaNombre varchar(30) NOT NULL,
+ParroquiaStatus varchar(15) NOT NULL,
+CONSTRAINT pk_Parroquia PRIMARY KEY (ParroquiaId),
+FOREIGN KEY (ProvinciaId) REFERENCES Provincia(ProvinciaId),
+FOREIGN KEY (CantonId) REFERENCES Canton(CantonId)
+);
